@@ -1,0 +1,1 @@
+/usr/bin/c++  -O3 -DNDEBUG   CMakeFiles/Week1_cpp_eigen.dir/main.cpp.o  -o Week1_cpp_eigen 
