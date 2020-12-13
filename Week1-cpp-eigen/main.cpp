@@ -10,9 +10,13 @@ using namespace std;
 #include <unsupported/Eigen/MatrixFunctions>
 using namespace Eigen;
 
+// Declaration
+Quaterniond quat_mul(Quaterniond q1,Quaterniond q2);
+
 int main() {
     // Initializae an euler_angle vector
-    // Roll-Yaw-Pitch: 0 -> -pi/2 -> -pi/4
+    // euler_angle: Roll-Pitch-Yaw
+    //              0 -> -pi/2 -> -pi/4
     Eigen::Vector3d euler_angle(-M_PI/ 4.0, -M_PI/ 2.0, 0.0);
     cout << "euler = " << euler_angle.transpose() << endl;
 
@@ -40,7 +44,23 @@ int main() {
 
     // R <- Rexp(w^)
     R = R*w_hat.exp();
-    cout << "R = \n" << R;
+    cout << "new R = \n" << R << endl;
+
+    // q <- q x [1,w].T
+    Eigen::Quaterniond w_mul(1,w(0)/2, w(1)/2, w(2)/2);
+    q = quat_mul(q, w_mul);
+    cout << "new q = " << q.coeffs().transpose() << endl;
+    cout << "new R from q = \n" << q.normalized().toRotationMatrix() << endl;
 
     return 0;
+}
+
+
+Quaterniond quat_mul(Quaterniond q1,Quaterniond q2) {
+    double x =  q1.x() * q2.w() + q1.y() * q2.z() - q1.z() * q2.y() + q1.w() * q2.x();
+    double y = -q1.x() * q2.z() + q1.y() * q2.w() + q1.z() * q2.x() + q1.w() * q2.y();
+    double z =  q1.x() * q2.y() - q1.y() * q2.x() + q1.z() * q2.w() + q1.w() * q2.z();
+    double w = -q1.x() * q2.x() - q1.y() * q2.y() - q1.z() * q2.z() + q1.w() * q2.w();
+
+    return Quaterniond(w,x,y,z);
 }
